@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour
 
     [Header("GamePlay"), ShowIf("scene", Scene.Gameplay)]
     [SerializeField, ShowIf("scene", Scene.Gameplay), SceneObjectsOnly] private Player player;
-    [SerializeField, ShowIf("scene", Scene.Gameplay), SceneObjectsOnly] private Button pauseButton;
     [SerializeField, ShowIf("scene", Scene.Gameplay), SceneObjectsOnly] private Button replayButton;
     [SerializeField, ShowIf("scene", Scene.Gameplay), SceneObjectsOnly] private Button backToMainMenuButton;
     [SerializeField, ShowIf("scene", Scene.Gameplay), SceneObjectsOnly] private RectTransform menuPanel;
@@ -44,8 +43,11 @@ public class GameManager : MonoBehaviour
         {
             HandleGamePlayButtonsUi();
         }
+        if (player != null)
+        {
+            player.onPlayerTouchASpickeOrDeathCollider += Player_onPlayerTouchASpickeOrDeathCollider;
+        }
     }
-
 
 
     private void OnDestroy()
@@ -58,6 +60,16 @@ public class GameManager : MonoBehaviour
         {
             HandleGamePlayButtonsUi(false);
         }
+
+        if (player != null)
+        {
+            player.onPlayerTouchASpickeOrDeathCollider -= Player_onPlayerTouchASpickeOrDeathCollider;
+        }
+    }
+
+    private void Player_onPlayerTouchASpickeOrDeathCollider(object sender, EventArgs e)
+    {
+        DisplayMenu(true, "GAME OVER");
     }
 
     #region GamePlay Scene Ui Manager
@@ -65,32 +77,17 @@ public class GameManager : MonoBehaviour
     {
         if (sub == true)
         {
-            AddListnerToButton(pauseButton, () => PauseButton());
             AddListnerToButton(replayButton, () => { SceneManager.LoadScene(SceneManager.GetActiveScene().name); });
             AddListnerToButton(backToMainMenuButton, () => { SceneManager.LoadScene("MainMenuScene"); });
         }
         else
         {
-            pauseButton.onClick.RemoveAllListeners();
             replayButton.onClick.RemoveAllListeners();
             backToMainMenuButton.onClick.RemoveAllListeners();
         }
     }
 
-    private void PauseButton()
-    {
-        isPaused = !isPaused;
-        if (isPaused == true)
-        {
-            Time.timeScale = 0f;
-            DisplayMenu(true, "Pause Menue");
-        }
-        else
-        {
-            DisplayMenu(false);
-            Time.timeScale = 1f;
-        }
-    }
+
     #endregion
 
 

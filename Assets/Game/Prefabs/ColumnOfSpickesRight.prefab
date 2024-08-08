@@ -48,9 +48,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4072519221701731908, guid: 772f2afb518df6e48bc5362b0c340c09, type: 3}
+      propertyPath: timeIn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4072519221701731908, guid: 772f2afb518df6e48bc5362b0c340c09, type: 3}
+      propertyPath: timeOut
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4519908897499729429, guid: 772f2afb518df6e48bc5362b0c340c09, type: 3}
       propertyPath: m_Name
-      value: ColumnOfSpickes
+      value: ColumnOfSpickesRight
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

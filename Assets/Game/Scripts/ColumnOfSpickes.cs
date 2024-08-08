@@ -16,13 +16,17 @@ public class ColumnOfSpickes : MonoBehaviour
     [SerializeField] private float timeOut;
 
     [SerializeField, ChildGameObjectsOnly] private Transform[] spickesOnTheColumnArrays;
+    [SerializeField, SceneObjectsOnly] private SideWaysSpikeManager sideWaysSpikeManager;
 
     private const float Z_ANGLE = 90f;
-    private const int MIN_NUMBER_OF_INDEXES = 3;
-    private const int MAX_NUMBER_OF_INDEXES = 5;
+    private const int MIN_NUMBER_OF_INDEXES = 4;
+    private const int MAX_NUMBER_OF_INDEXES = 10;
 
     private void Awake()
     {
+        sideWaysSpikeManager.onPlayerChooseHisFirstSide += SideWaysSpikeManager_onPlayerChooseHisFirstSide;
+        sideWaysSpikeManager.onPlayerReachesOnOfTheSides += SideWaysSpikeManager_onPlayerReachesOnOfTheSides;
+
         if (side == SpickColumSide.Right)
         {
             SetSpickesAngle(Z_ANGLE);
@@ -34,47 +38,56 @@ public class ColumnOfSpickes : MonoBehaviour
             SetColumsStartPositionOnX(-xHideposition);
         }
     }
-
-    void Start()
+    private void OnDisable()
     {
-        StartCoroutine(COR_MoveColumsAndActivateSpickes());
+        sideWaysSpikeManager.onPlayerChooseHisFirstSide -= SideWaysSpikeManager_onPlayerChooseHisFirstSide;
+        sideWaysSpikeManager.onPlayerReachesOnOfTheSides -= SideWaysSpikeManager_onPlayerReachesOnOfTheSides;
     }
 
-    private IEnumerator COR_MoveColumsAndActivateSpickes()
+    private void SideWaysSpikeManager_onPlayerChooseHisFirstSide(object sender, SpickColumSide e)
     {
-        while (true)
+        if (e == side)
         {
-            foreach (var spike in spickesOnTheColumnArrays)
-            {
-                spike.gameObject.SetActive(false);
-            }
-
-            int[] indexesArray = GenerateRandomIndexes(spickesOnTheColumnArrays.Length, UnityEngine.Random.Range(MIN_NUMBER_OF_INDEXES, MAX_NUMBER_OF_INDEXES));
-
-            foreach (var index in indexesArray)
-            {
-                spickesOnTheColumnArrays[index].gameObject.SetActive(true);
-            }
-
-            if (side == SpickColumSide.Right)
-            {
-                ColumnMovment(xMoveForwardEndPosition, xHideposition);
-            }
-            else
-            {
-                ColumnMovment(-xMoveForwardEndPosition, -xHideposition);
-            }
-
-            yield return new WaitForSeconds(timeOut + timeOut + 0.15f);
+            ActivateTheSpickes();
+        }
+    }
+    private void SideWaysSpikeManager_onPlayerReachesOnOfTheSides(object sender, SpickColumSide e)
+    {
+        if (e != side)
+        {
+            ActivateTheSpickes();
         }
     }
 
-    private void ColumnMovment(float xMoveForward, float xHide)
+
+    private void ActivateTheSpickes()
     {
-        transform.DOMoveX(xMoveForward, timeIn).OnComplete(() =>
+
+        foreach (var spike in spickesOnTheColumnArrays)
         {
-            transform.DOMoveX(xHide, timeOut);
-        });
+            spike.gameObject.SetActive(false);
+        }
+
+        int[] indexesArray = GenerateRandomIndexes(spickesOnTheColumnArrays.Length, UnityEngine.Random.Range(MIN_NUMBER_OF_INDEXES, MAX_NUMBER_OF_INDEXES));
+
+        foreach (var index in indexesArray)
+        {
+            spickesOnTheColumnArrays[index].gameObject.SetActive(true);
+        }
+
+        if (side == SpickColumSide.Right)
+        {
+            ColumnMoveForward(xMoveForwardEndPosition);
+        }
+        else
+        {
+            ColumnMoveForward(-xMoveForwardEndPosition);
+        }
+    }
+
+    private void ColumnMoveForward(float xMoveForward)
+    {
+        transform.DOMoveX(xMoveForward, timeIn);
     }
 
     private void SetSpickesAngle(float zAngle)
@@ -108,15 +121,5 @@ public class ColumnOfSpickes : MonoBehaviour
         }
 
         return new List<int>(uniqueIndexes).ToArray();
-    }
-
-    [Button]
-    private void TEST_GenerateIndexes()
-    {
-        int[] array = GenerateRandomIndexes(spickesOnTheColumnArrays.Length, UnityEngine.Random.Range(3, 9));
-        foreach (var item in array)
-        {
-            Debug.Log(item);
-        }
     }
 }
